@@ -12,11 +12,11 @@ clc;
 
 % 设定参数
 dac_fs = 1e3;      % DAC采样率(单位:MSPS)
-dac_fo = 170;      % DAC输出信号目标频率(单位:MHz)
+dac_fo = 180;      % DAC输出信号目标频率(单位:MHz)
 dds_channel = 8;   % DDS并行度
 pinc_width = 16;   % DDS IP核中设置的相位增量控制字位宽
 data_width = 16;   % DDS IP核中设置的信号输出位宽
-sim_point = 512;   % 仿真点数
+sim_point = 32768; % 仿真点数
 
 % 计算RTL模块所需参数
 pinc = round(dac_fo / dac_fs * 2^pinc_width); % DAC数字量信号的相位增量控制字
@@ -37,27 +37,19 @@ end
 dac_signal = reshape(signal', 1, []) ;
 
 % 绘制时域、频域波形
-data = dac_signal;
-fs = dac_fs;
-S = fftshift(fft(data));
-S = 20 * log10(abs(S));
-N = length(data);  
-Bs = fs / 2;
-T = N / fs;
-f = -Bs + [0:N-1] / T; 
-t = [0:N-1] / fs;
+[Amplitude, t, f] = my_fft(dac_signal, dac_fs);
 
 subplot(2,1,1);
-plot(t, data);
+plot(t, dac_signal);
 xlabel('时间/us');
 title('时域波形');
 axis([min(t), max(t), -inf, inf]);
 
 subplot(2,1,2);
-plot(f, S-max(S));
+plot(f, Amplitude - max(Amplitude));
 xlabel('频率/MHz');
 title('幅度谱');
 axis([min(f), max(f), -inf, inf]);
 grid on;
 
-clearvars -except dac_fs dac_fo dds_channel pinc_width sim_point pinc dds_clk dds1_signal dac_signal;
+clearvars -except dac_fs dac_fo dds_channel pinc_width sim_point pinc dds_clk;

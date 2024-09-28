@@ -1,11 +1,11 @@
 #设置testbench模块名(将[]替换为testbench模块名)
-set x_tb interleaver_tb
+set x_tb dds_parallel_tb
 #设置器件厂家(将[]替换为 xilinx 或 altera )
 set MFR xilinx
 #是否使用了IP核(use_IP=1代表使用了IP核,use_IP=0代表没有使用IP核)
-set use_IP 0
+set use_IP 1
 #设定xilinx库路径
-set xilinx_path {D:/Modelsim/xilinx2021_lib}
+set xilinx_path {D:/Modelsim/xilinx2022_lib}
 #设定altera库路径
 #set altera_path {D:/Modelsim/altera_lib}
 

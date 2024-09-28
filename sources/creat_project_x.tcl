@@ -20,10 +20,10 @@ file mkdir ./outputs
 create_project -part $chip_type -force $project_name    
 # 添加RTL设计文件至sources_1文件集
 add_files -fileset sources_1 -norecurse -scan_for_includes ../sources/RTL
-# 添加IP核配置文件
-add_files -norecurse ../sources/IP/dds_compiler.xci
+# 添加IP文件
+import_files -norecurse ../sources/IP/dds.xci
 # 添加测试文件至sim_1文件集
-add_files -fileset sim_1 -norecurse -scan_for_includes ../sources/TB
+add_files -fileset sim_1 -norecurse -scan_for_includes ../sources/TB/dds_parallel_tb.v
 # 添加约束文件至constrs_1文件集
 if {$bitstream_p=="1"} {
 add_files -fileset constrs_1 ../sources/CONSTRS
@@ -31,7 +31,12 @@ add_files -fileset constrs_1 ../sources/CONSTRS
 # 更新编译顺序(形成模块间的层次关系,找到顶层模块)
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
-generate_target all [get_files ../sources/IP/dds_compiler.xci]
+
+# 生成IP输出文件
+generate_target all [get_files dds.xci]
+create_ip_run [get_files -of_objects [get_fileset sources_1] dds.xci]
+launch_runs dds_synth_1
+wait_on_run dds_synth_1
 
 # 生成RTL视图并导出为PDF
 synth_design -rtl -rtl_skip_mlo -name rtl_1
@@ -51,7 +56,7 @@ ipx::unload_core ../my_ip/$project_name/component.xml
 ipx::edit_ip_in_project -upgrade true -name tmp_edit_project -directory ../my_ip/$project_name ../my_ip/$project_name/component.xml
 
 set_property name $project_name [ipx::current_core]
-set_property version 1.4 [ipx::current_core]
+set_property version 1.0 [ipx::current_core]
 set_property display_name $project_name [ipx::current_core]
 
 set_property description {wyxee2000@163.com} [ipx::current_core]
